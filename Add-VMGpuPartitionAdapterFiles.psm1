@@ -134,7 +134,8 @@ function Show-MainMenu {
     Write-Host "1. Add GPU to VM"
     Write-Host "2. Remove GPU from VM"
     Write-Host "3. Update drivers in VM"
-    Write-Host "4. Exit"
+    Write-Host "4. Set Hyper-V registry override"
+    Write-Host "9. Exit"
     Write-Host ""
 }
 
@@ -437,6 +438,46 @@ function Read-VramBytes {
     } while ($true)
 }
 
+function Set-HyperVRegistryOverrideFlow {
+    try {
+        Write-Header "Set Hyper-V registry override"
+
+        $regPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\HyperV'
+        $valueName = 'RequireSupportedDeviceAssignment'
+        $valueData = 0
+
+        Write-Host "This will ensure the following registry setting exists:" -ForegroundColor Yellow
+        Write-Host "$regPath\$valueName = $valueData (DWORD)" -ForegroundColor Cyan
+        Write-Host ""
+
+        if (-not (Read-YesNo -Prompt "Continue")) {
+            Write-Host "Cancelled." -ForegroundColor Yellow
+            return
+        }
+
+        if (-not (Test-Path $regPath)) {
+            Write-Host "Registry path does not exist. Creating it..." -ForegroundColor Yellow
+            New-Item -Path $regPath -Force | Out-Null
+        }
+        else {
+            Write-Host "Registry path already exists." -ForegroundColor DarkGray
+        }
+
+        New-ItemProperty -Path $regPath -Name $valueName -PropertyType DWord -Value $valueData -Force | Out-Null
+
+        $result = Get-ItemProperty -Path $regPath -Name $valueName -ErrorAction Stop
+
+        Write-Host "Registry value set successfully." -ForegroundColor Green
+        Write-Host "$valueName = $($result.$valueName)" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "ERROR: $($_.Exception.Message)" -ForegroundColor Red
+    }
+    finally {
+        Pause-Menu
+    }
+}
+
 function Add-GpuToVmFlow {
     $mounted = $false
     $vhdPath = $null
@@ -600,7 +641,8 @@ do {
         '1' { Add-GpuToVmFlow }
         '2' { Remove-GpuFromVmFlow }
         '3' { Update-DriversInVmFlow }
-        '4' { break }
+        '4' { Set-HyperVRegistryOverrideFlow }
+        '9' { break }
         default {
             Write-Host "Invalid choice." -ForegroundColor Red
             Pause-Menu
