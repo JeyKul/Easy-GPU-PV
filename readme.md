@@ -9,8 +9,13 @@ We passed through the Intel UHD 630 using 0.5GB (V)RAM
 To execute the script you can use:
 
 To see if you can use it:
-```irm "https://catbin.sh/r/c0693c54" | iex```
+
+```powershell
+irm "https://catbin.sh/r/c0693c54" | iex
+```
 
 To use it:
 
-```irm "https://catbin.sh/r/4bde4058" | iex```
+```powershell
+irm "https://catbin.sh/r/4bde4058" | iex
+```
